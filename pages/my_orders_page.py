@@ -20,7 +20,6 @@ class MyOrdersPage(BasePage):
         create_order_button = wait.until(EC.element_to_be_clickable(MyOrdersPageLocators.GOODS_REDEMPTION_BUTTON))
         create_order_button.click()
 
-    def
 
 
 

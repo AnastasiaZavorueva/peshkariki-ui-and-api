@@ -16,4 +16,4 @@ class TestStartPage:
         start_page.open_page()
         start_page.login(login_credentials)
         wait = WebDriverWait(browser, 10)
-        assert (wait.until(EC.url_to_be(Links.orders_page)))
+        assert (wait.until(EC.url_to_be(Links.my_orders_page)))
