@@ -2,5 +2,5 @@
 
 class Links:
     start_page = "http://alt10.peshkariki.ru/"
-    orders_page = "https://alt10.peshkariki.ru/cabinet/ordersList/"
-
+    my_orders_page = "https://alt10.peshkariki.ru/cabinet/ordersList/"
+    order_creation_form_page = "https://alt10.peshkariki.ru/cabinet/AddForAll"

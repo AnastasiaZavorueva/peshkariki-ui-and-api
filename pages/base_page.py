@@ -4,7 +4,10 @@
 
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
+import time
+import allure
 
 
 class BasePage:
@@ -13,10 +16,18 @@ class BasePage:
         self.browser = browser
         self.url = url
 
+    @allure.step(f"Open specific page")
     def open_page(self):
         self.browser.get(self.url)
 
+    @allure.step("Clear input field selected (from default value)")
     def clear_text_field(self, element):
         while (element.get_attribute("value") == "") is False:
             element.send_keys(Keys.BACKSPACE)
+
+    @allure.step("Get URL of current page")
+    def get_current_url(self):
+        time.sleep(1)
+        return self.browser.current_url
+
 
