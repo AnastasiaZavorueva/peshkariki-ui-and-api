@@ -11,7 +11,7 @@ class TestData:
          "type_sender_floor": None,
          "sender_apt_or_office": None,
          "sender_phone": "8999888888",  # MSK number
-         "pick_up_date": 0,
+         "pick_up_date": 3,
          "start_time_of_pick_up": None,  # so, it was left as it was selected by default
          "end_time_of_pick_up": "DM",  # to select "doesn't matter/не важно" option
 
@@ -23,7 +23,7 @@ class TestData:
          "recipient_floor": None,
          "recipient_apt_or_office": None,
          "recipient_phone": "8999888888",  # MSK number
-         "receiving_date": 0,
+         "receiving_date": 3,
          "start_time_receiving": None, # so, it was left as it was selected by default
          "end_time_receiving": "23:30",
          "get_payment_for_goods": True,
@@ -40,7 +40,7 @@ class TestData:
          "billing_info_for_return": "+ 78999888888",
          # "type_of_payment_for_delivery": "",
 
-         "promocode": "шикарно"
+         "promocode": "поехал"
          }
 
         #

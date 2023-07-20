@@ -121,7 +121,7 @@ class OrderCreationForm(BasePage):
     # the next method is used to expand block with 2 additional fields:
     # 1) sender name 2) comment to sender address
     def expand_additional_sender_info_fields(self):
-        time.sleep(1)
+        time.sleep(2)
         expand_add_info_button = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.ADDITIONAL_SENDER_INFO_BUTTON))
         expand_add_info_button.click()
 
@@ -211,7 +211,7 @@ class OrderCreationForm(BasePage):
     # the next method is used to expand block with 2 additional fields:
     # 1) recipient name 2) comment to recipient address
     def expand_additional_recipient_info_fields(self):
-        time.sleep(1)
+        time.sleep(2)
         expand_add_info_button = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.ADDITIONAL_RECIPIENT_INFO_BUTTON))
         expand_add_info_button.click()
 
@@ -259,6 +259,8 @@ class OrderCreationForm(BasePage):
         value_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.VALUE_FIELD))
         value_field.send_keys(value)
 
+
+    @allure.step("Set weight of one item in delivery from predefined options (using user input in grams)")
     # for the next method "weight" parameter should be provided as a number of grams
     def set_weight_for_one_item_from_predefined_options(self, weight):
         weight_select_object = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.WEIGHT_DROPDOWN))
@@ -277,6 +279,7 @@ class OrderCreationForm(BasePage):
         if 10000 <= weight < 15000:
             Select(weight_select_object).select_by_value("15000")
 
+    @allure.step("Set custom weight of one item in delivery (in grams)")
     def set_custom_weight_in_grams(self, weight):
         weight_select_object = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.WEIGHT_DROPDOWN))
         Select(weight_select_object).select_by_value("x")
@@ -284,6 +287,7 @@ class OrderCreationForm(BasePage):
         self.clear_text_field(weight_input_field)
         weight_input_field.send_keys(weight)
 
+    @allure.step("Set quantity of items in delivery)")
     def set_quantity(self, count):
         count_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.QUANTITY_FIELD))
         self.clear_text_field(count_field)
@@ -292,70 +296,83 @@ class OrderCreationForm(BasePage):
 
     # the next 4 methods are used to define
     # how payment for items delivered will be returned to sender
-
+    @allure.step("Select (in checkbox) 'Банковская карта'/'Card' option as a type of payment return for goods delivered")
     def set_type_of_payment_return_for_goods_as_card(self):
         return_payment_to_card_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.RETURN_PAYMENT_TO_CARD_OPTION))
         return_payment_to_card_option.click()
 
+    @allure.step("Select (in checkbox) 'ЮMoney (Я.Деньги)'/'YMoney' option as a type of payment return for goods delivered")
     def set_type_of_payment_return_for_goods_as_y_money(self):
         return_payment_to_y_money_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.RETURN_PAYMENT_TO_Y_MONEY_OPTION))
         return_payment_to_y_money_option.click()
 
+    @allure.step("Select (in checkbox) 'QIWI' option as a type of payment return for goods delivered")
     def set_type_of_payment_return_for_goods_as_qiwi(self):
         return_payment_to_qiwi_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.RETURN_PAYMENT_TO_QIWI_OPTION))
         return_payment_to_qiwi_option.click()
 
+    @allure.step("Type 'Номер карты, кошелька...' (billing info) for payment return for goods delivered")
     def type_billing_info_for_return(self, info):
         billing_info_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.CARD_OR_Y_MONEY_OR_QIWI_NUMBER_FIELD))
         billing_info_field.send_keys(info)
 
-
+    @allure.step("Select (in checkbox) 'Возврат за минусом доставки'/'Return except price of delivery' option as a type of payment for delivery")
     # the next 6 methods are used to define how delivery will be
     def set_payment_for_delivery_as_return_except_price_of_delivery(self):
         return_except_delivery_price_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.PAYMENT_RETURN_EXCEPT_DELIVERY_PRICE_OPTION))
         return_except_delivery_price_option.click()
 
+    @allure.step("Select (in checkbox) 'Отправитель наличными'/'Sender by cash' option as a type of payment for delivery")
     def set_payment_for_delivery_as_sender_by_cash(self):
         sender_by_cash_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.SENDER_PAYS_BY_CASH_OPTION))
         sender_by_cash_option.click()
 
+    @allure.step("Select (in checkbox) 'Получатель наличными'/'Recipient by cash' option as a type of payment for delivery")
     def set_payment_for_delivery_as_recipient_by_cash(self):
         recipient_by_cash_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.RECIPIENT_PAYS_BY_CASH_OPTION))
         recipient_by_cash_option.click()
 
+    @allure.step("Select (in checkbox) 'Онлайн банковской картой'/'Online by card' option as a type of payment for delivery")
     def set_payment_for_delivery_as_online_by_card(self):
         online_by_card_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.ONLINE_PAYMENT_BY_CARD_OPTION))
         online_by_card_option.click()
 
+    @allure.step("Select (in checkbox) 'Оплата бонусами'/'By points' option as a type of payment for delivery")
     # the next method is used to select the option "Оплата бонусами"
     def set_payment_for_delivery_as_by_points(self):
         by_points_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.PAYMENT_BY_POINTS_OPTION))
         by_points_option.click()
 
+    @allure.step("Select (in checkbox) 'Оплата с баланса личного кабинета'/'From personal account balance' option as a type of payment for delivery")
     def set_payment_for_delivery_as_from_personal_acc_balance(self):
         from_personal_acc_balance_option = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.PAYMENT_FROM_PERSONAL_ACC_BALANCE_OPTION))
         from_personal_acc_balance_option.click()
 
+    @allure.step("Type promocode into input field")
     def type_promocode(self, code):
         if code is not None:
             promocode_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.PROMOCODE_FIELD))
             promocode_field.send_keys(code)
+            self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.PROMOCODE_GREEN_INDICATOR))
 
+    @allure.step("Click on 'Запустить заказ'/'Create order' button to submit the form")
     def accept_order_creation_form(self):
         accept_button = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.ACCEPT_ORDER_CREATION_BUTTON))
         accept_button.click()
 
+    @allure.step("Check that order confirmation window is shown")
     def order_confirmation_window_is_shown(self):
         confirmation_windows_found = self.wait.until(ec.visibility_of_all_elements_located(OrderCreationFormLocators.ORDER_CONFIRMATION_WINDOW))
         return len(confirmation_windows_found) == 1
 
+    @allure.step("Get the number of order created (from confirmation window)")
     def get_number_of_order_created(self):
         confirmation_title = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.TITLE_IN_ORDER_CONFIRMATION_WINDOW))
         confirmation_title_text = confirmation_title.text
         text_split = confirmation_title_text.split()
         return (text_split[1])[1:]  # by that the number of order from confirmation window is returned without "№" symbol
 
-    @allure.step("Select 'Документы'/'Documents' option as what to deliver")
+    @allure.step("Close order confirmation window")
     def close_confirmation_window(self):
         close_button = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.CLOSE_ORDER_CONFIRMATION_WINDOW_BUTTON))
         close_button.click()

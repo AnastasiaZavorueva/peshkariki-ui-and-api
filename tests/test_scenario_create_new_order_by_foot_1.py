@@ -63,7 +63,7 @@ class TestScenarioCreateNewOrder1:
         creation_form.type_billing_info_for_return(order_data["billing_info_for_return"])
 
         creation_form.set_payment_for_delivery_as_return_except_price_of_delivery()
-        # creation_form.type_promocode(order_data["promocode"])
+        creation_form.type_promocode(order_data["promocode"])
 
         creation_form.accept_order_creation_form()
 
@@ -78,8 +78,7 @@ class TestScenarioCreateNewOrder1:
 
 
 
-        # # #
-        # # #
+
         # # #
         # # # # my_orders_page = MyOrdersPage(browser, Links.my_orders_page)
         # # # # my_orders_page.navigate_to_create_order()

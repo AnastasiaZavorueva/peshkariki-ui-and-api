@@ -117,6 +117,11 @@ class OrderCreationFormLocators:
     PAYMENT_FROM_PERSONAL_ACC_BALANCE_OPTION = (By.XPATH, f"{ORDER_DETAILS_BLOCK}//span[contains(text(), 'Оплата с баланса личного кабинета')]/../input")
 
     PROMOCODE_FIELD = (By.XPATH, f"{ORDER_DETAILS_BLOCK}//div[@class='string promocode']//input")
+    # the next two locators are used to determine whether the promocode entered before was accepted
+    # (it's determined by either green or red sign-indicator next to the promocode input field))
+    PROMOCODE_GREEN_INDICATOR = (By.XPATH, f"{ORDER_DETAILS_BLOCK}//div[@class='string promocode']//input[contains(@style, 'green_check')]")
+    PROMOCODE_RED_INDICATOR = (By.XPATH, f"{ORDER_DETAILS_BLOCK}//div[@class='string promocode']//input[contains(@style, 'wrong_cross')]")
+
 
     ACCEPT_ORDER_CREATION_BUTTON = (By.XPATH, "//button[@class='start']")
 
