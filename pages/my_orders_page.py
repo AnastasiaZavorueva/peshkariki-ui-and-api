@@ -32,12 +32,21 @@ class MyOrdersPage(BasePage):
             if clear_number == order_number:
                 return True
         return False
-   #
-   #  def get_sender_address_from_order(self, order_number):
-   #      if self.order_is_shown_in_list(order_number):
-   #
-   #
-   #
+
+    @allure.step("Get sender address from specific order (found by the order number provided)")
+    def get_sender_address_from_order(self, order_number):
+            all_active_orders_shown = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
+            for active_order in all_active_orders_shown:
+                order_number = active_order.find_element(*MyOrdersPageLocators.ORDER_NUMBER_SHOWN)
+                if order_number.text.strip()[1:] == order_number:
+                    sender_address_shown = active_order.find_element(*MyOrdersPageLocators.SENDER_ADDRESS_SHOWN)
+                    clear_address = sender_address_shown.text.strip()[1:] # because on frontend the address is shown with the symbol "," in the beginning
+                    return clear_address
+
+
+
+
+
    #  def get_recipient_address_from_order(self, order_number):
    #
    #  def get_what_to_deliver_from_order(self, order_number):

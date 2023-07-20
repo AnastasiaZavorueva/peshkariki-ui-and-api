@@ -121,7 +121,7 @@ class OrderCreationForm(BasePage):
     # the next method is used to expand block with 2 additional fields:
     # 1) sender name 2) comment to sender address
     def expand_additional_sender_info_fields(self):
-        time.sleep(2)
+        time.sleep(3)
         expand_add_info_button = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.ADDITIONAL_SENDER_INFO_BUTTON))
         expand_add_info_button.click()
 
@@ -211,7 +211,7 @@ class OrderCreationForm(BasePage):
     # the next method is used to expand block with 2 additional fields:
     # 1) recipient name 2) comment to recipient address
     def expand_additional_recipient_info_fields(self):
-        time.sleep(2)
+        time.sleep(3)
         expand_add_info_button = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.ADDITIONAL_RECIPIENT_INFO_BUTTON))
         expand_add_info_button.click()
 
@@ -352,6 +352,7 @@ class OrderCreationForm(BasePage):
     def type_promocode(self, code):
         if code is not None:
             promocode_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.PROMOCODE_FIELD))
+            self.clear_text_field(promocode_field)
             promocode_field.send_keys(code)
             self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.PROMOCODE_GREEN_INDICATOR))
 

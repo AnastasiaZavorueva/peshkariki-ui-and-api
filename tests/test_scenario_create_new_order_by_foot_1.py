@@ -74,6 +74,7 @@ class TestScenarioCreateNewOrder1:
         assert creation_form.get_current_url() == Links.my_orders_page
 
         assert my_orders_page.order_is_shown_in_list(number_of_order_created)
+        # assert my_orders_page.get_sender_address_from_order(number_of_order_created) == order_data["sender_address"]
 
 
 
