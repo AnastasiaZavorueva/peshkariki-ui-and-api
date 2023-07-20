@@ -128,7 +128,7 @@ class OrderCreationForm(BasePage):
     @allure.step("Type sender name into input field")
     def type_sender_name(self, name):
         if name is not None:
-            name_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.SENDER_NAME_FIELD))
+            name_field = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.SENDER_NAME_FIELD))
             name_field.send_keys(name)
 
     @allure.step("Type comment to sender address into input field")
@@ -218,7 +218,7 @@ class OrderCreationForm(BasePage):
     @allure.step("Type recipient name into input field")
     def type_recipient_name(self, name):
         if name is not None:
-            name_field = self.wait.until(ec.visibility_of_element_located(OrderCreationFormLocators.RECIPIENT_NAME_FIELD))
+            name_field = self.wait.until(ec.element_to_be_clickable(OrderCreationFormLocators.RECIPIENT_NAME_FIELD))
             name_field.send_keys(name)
 
     @allure.step("Type comment to recipient address into input field")

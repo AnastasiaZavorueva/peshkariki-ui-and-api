@@ -11,4 +11,7 @@ class MyOrdersPageLocators:
 
     # the next locators are used to get data from specific order (that should be located before that)
     ORDER_NUMBER_SHOWN = (By.XPATH, "//h5/a")
-    SENDER_ADDRESS_SHOWN = (By.XPATH, "//div[@class='order-data']//span[@class='point-place']")
+    ADDRESSES_IN_ORDER_SHOWN = (By.XPATH, "//div[@class='order-data']//span[@class='point-place']") # this locator returns 2 elements, first (under index 0) belongs to sender_address, while the second (under index 1) belongs to sender_address
+    WHAT_TO_DELIVER_SHOWN = (By.XPATH, "//ul[@class='main-orders-list']//li[@class='order']//li[contains(text(), 'Товар:')]")
+    TOTAL_WEIGHT_SHOWN = (By.XPATH, "//ul[@class='main-orders-list']//li[@class='order']//li[contains(text(), 'Масса:')]")
+    TOTAL_VALUE = (By.XPATH, "//ul[@class='main-orders-list']//li[@class='order']//li[contains(text(), 'Цена:')]")

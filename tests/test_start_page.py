@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class TestStartPage:
 
-    @pytest.mark.parametrize("login_credentials", TestData.valid_login_credentials)
+    @pytest.mark.parametrize("login_credentials", TestData.valid_login_credentials_msk_user)
     def test_valid_login(self, browser, login_credentials):
         start_page = StartPage(browser, Links.start_page)
         start_page.open_page()

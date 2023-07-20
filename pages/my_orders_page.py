@@ -33,38 +33,58 @@ class MyOrdersPage(BasePage):
                 return True
         return False
 
+
+# THE NEXT METHODS ARE NOT TESTED YET
+
+    #  helper-method used to find block (web-element) that contains info of specific order (found by order number provided);
+    def get_order_block(self, order_number):
+        all_active_orders_shown = self.wait.until(
+            ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
+        for active_order in all_active_orders_shown:
+            order_number_detected = active_order.find_element(*MyOrdersPageLocators.ORDER_NUMBER_SHOWN)
+            if order_number_detected.text.strip()[1:] == order_number:
+                return active_order
+
     @allure.step("Get sender address from specific order (found by the order number provided)")
     def get_sender_address_from_order(self, order_number):
-            all_active_orders_shown = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
-            for active_order in all_active_orders_shown:
-                order_number = active_order.find_element(*MyOrdersPageLocators.ORDER_NUMBER_SHOWN)
-                if order_number.text.strip()[1:] == order_number:
-                    sender_address_shown = active_order.find_element(*MyOrdersPageLocators.SENDER_ADDRESS_SHOWN)
-                    clear_address = sender_address_shown.text.strip()[1:] # because on frontend the address is shown with the symbol "," in the beginning
-                    return clear_address
+        order_needed = self.get_order_block(order_number)
+        sender_address_element = order_needed.find_element(MyOrdersPageLocators.ADDRESSES_IN_ORDER_SHOWN)[0]  # we use index 0 because the locator returns 2 elements with addresses: the first one (with index 0) belongs to sender, while the second (with index 1) belongs to recipient
+        clear_address_without_subway_info_and_dots_inside = sender_address_element.text.split("км, ")[1].strip().replace(".", "")
+        return clear_address_without_subway_info_and_dots_inside
+
+    @allure.step("Get recipient address from specific order (found by the order number provided)")
+    def get_recipient_address_from_order(self, order_number):
+        order_needed = self.get_order_block(order_number)
+        recipient_address_element = order_needed.find_elements(*MyOrdersPageLocators.ADDRESSES_IN_ORDER_SHOWN)[1]# we use index 0 because the locator returns 2 elements with addresses: the first one (with index 0) belongs to sender, while the second (with index 1) belongs to recipient
+        clear_address_without_subway_info_and_dots_inside = recipient_address_element.text.split("км, ")[1]
+        return clear_address_without_subway_info_and_dots_inside
+
+    @allure.step("Get value of what to deliver from specific order (found by the order number provided)")
+    def get_what_to_deliver_from_order(self, order_number):
+        order_needed = self.get_order_block(order_number)
+        what_to_deliver_element = order_needed.find_element(MyOrdersPageLocators.WHAT_TO_DELIVER_SHOWN)
+        what_to_deliver_value = what_to_deliver_element.text.split(": ")[1].strip
+        if what_to_deliver_value == "Документы":
+            return "docs"
+        return what_to_deliver_value
+
+    def get_total_weight_from_order(self, order_number):
+        order_needed = self.get_order_block(order_number)
+        total_weight_element = order_needed.find_element(MyOrdersPageLocators.TOTAL_WEIGHT_SHOWN)
+        clear_total_weight_value = total_weight_element.text.split(" ")[1].strip
+        return clear_total_weight_value
 
 
+    def get_total_value_from_order(self, order_number):
+        order_needed = self.get_order_block(order_number)
+        total_value_element = order_needed.find_element(MyOrdersPageLocators.TOTAL_VALUE_SHOWN)
+        clear_total_value = total_value_element.text.split(" ")[1].strip
+        return clear_total_value
+
+    # def get_pick_up_date_from_order(self, order_number):
+    #
+    # def get_delivery_date_from_order(self, order_number):
 
 
-
-   #  def get_recipient_address_from_order(self, order_number):
-   #
-   #  def get_what_to_deliver_from_order(self, order_number):
-   #
-   #  def get_weight_from_order(self, order_number):
-   #
-   #  def get_value_from_order(self, order_number):
-   #
-   #  def get_pick_up_date_from_order(self, order_number):
-   #
-   #  def get_delivery_date_from_order(self, order_number):
-   #
-   #
    # #TODO: methods to check 1) start time of pick up 2) end time of pick up 3) start time of delivery 4) end time of delivery 5) price of delivery 6) amount of money to be returned as payments for delivered goods
    # #TODO: methods to 2) edit order created (can be also used for check of order data) 2) cancel order created
-   #
-   #
-   #
-   #
-   #
-   #
