@@ -3,9 +3,9 @@ from pages.order_creation_form import OrderCreationForm
 from config import Links
 from tests.test_data import TestData
 import pytest
+import time
 
 import allure
-from allure_commons.types import AttachmentType
 
 class TestScenarioCreateNewOrder1:
 
@@ -58,7 +58,6 @@ class TestScenarioCreateNewOrder1:
 
         creation_form.set_quantity(order_data["quantity"])
 
-
         creation_form.set_type_of_payment_return_for_goods_as_card()
         creation_form.type_billing_info_for_return(order_data["billing_info_for_return"])
 
@@ -73,48 +72,18 @@ class TestScenarioCreateNewOrder1:
 
         assert creation_form.get_current_url() == Links.my_orders_page
 
-        assert my_orders_page.order_is_shown_in_list(number_of_order_created)
+        assert my_orders_page.order_is_shown_in_list_as_active(number_of_order_created)
 
-        # assert my_orders_page.get_sender_address_from_order(number_of_order_created) == order_data["sender_address"]
+        assert my_orders_page.get_sender_address_from_order(number_of_order_created) == order_data["sender_address"]
+        assert my_orders_page.get_recipient_address_from_order(number_of_order_created) == order_data["recipient_address"]
+
+        assert my_orders_page.get_what_to_deliver_from_order(number_of_order_created) == order_data["what_to_deliver"]
+        assert my_orders_page.get_total_weight_from_order(number_of_order_created) == (order_data["weight"]*order_data["quantity"])
+        assert my_orders_page.get_total_value_from_order(number_of_order_created) == (order_data["quantity"]*order_data["value_per_item"])
+
+        # cancel order created after executing the whole test
+        my_orders_page.cancel_order_as_parcel_not_ready(number_of_order_created)
+        assert my_orders_page.order_is_shown_in_list_as_canceled(number_of_order_created) is True
 
 
 
-
-
-        # # #
-        # # # # my_orders_page = MyOrdersPage(browser, Links.my_orders_page)
-        # # # # my_orders_page.navigate_to_create_order()
-        # # # # my_orders_page.select_goods_and_docs_delivery()
-        # # # #
-        # # # # creation_form = OrderCreationForm(browser, Links.order_creation_form_page)
-        # # # # creation_form.select_on_foot_delivery_type()
-        # # # #
-        # # # # creation_form.type_sender_address(order_data["sender_address"])
-        # # # # creation_form.type_sender_entrance()
-        # # # # creation_form.type_sender_floor()
-        # # # # creation_form.type_sender_apt_or_office()
-        # # # # creation_form.type_sender_phone()
-        # # # # creation_form.select_pick_up_date()
-        # # # # creation_form.set_start_time_of_pick_up()
-        # # # # creation_form.set_end_time_of_pick_up()
-        # # # #
-        # # # # creation_form.expand_additional_sender_info_fields()
-        # # # # creation_form.type_sender_name()
-        # # # # creation_form.type_comment_to_sender_address()
-        # # # #
-        # # # # creation_form.type_recipient_address()
-        # # # # creation_form.type_recipient_entrance()
-        # # # # creation_form.type_recipient_floor()
-        # # # # creation_form.type_recipient_apt_or_office()
-        # # # # creation_form.type_recipient_phone()
-        # # # # creation_form.select_receiving_date()
-        # # # # creation_form.set_start_time_of_receiving()
-        # # # # creation_form.set_end_time_receiving()
-        # # # # creation_form.select_get_payment_for_goods()
-        # # # #
-        # # # # creation_form.expand_additional_recipient_info_fields()
-        # # # # creation_form.type_recipient_name()
-        # # # # creation_form.type_comment_to_recipient_address()
-        # # # #
-        # # # #
-        # # # #
