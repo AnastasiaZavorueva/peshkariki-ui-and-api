@@ -141,12 +141,10 @@ class MyOrdersPage(BasePage):
             confirm_order_cancellation_button.click()
             print("I clicked to cancel")
 
-            # #DOESN'T WORK
             self.wait.until(lambda driver: order_needed.get_attribute('class') == 'order canceled')
             print("Class changed to canceled")
 
-
-            # time.sleep(3)
+            # ANOTHER WAY TO CHECK "CANCELLED" INDICATOR PRESENCE
             # self.wait.until(lambda driver: len(order_needed.find_elements(*MyOrdersPageLocators.CANCELED_ORDER_INDICATOR)) == 1)
             # print("I got indicator")
 
