@@ -1,9 +1,14 @@
+from selenium.webdriver.remote.webelement import WebElement
+
 from pages.base_page import BasePage
 from locators.my_orders_page_locators import MyOrdersPageLocators
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 import allure
 import time
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.expected_conditions import staleness_of
+
 
 
 class MyOrdersPage(BasePage):
@@ -27,10 +32,19 @@ class MyOrdersPage(BasePage):
         create_order_button.click()
 
 
+    # it's better to use the next 2 methods for order status verification - whether it is active, canceled, or simply does not exist
+    # (because, for example, False result of order_is_shown_in_list_as_canceled could be either it's active or doesn't exist, so the
+    # additional check by another method is needed for clarification)
 
     @allure.step("Check that specific order (found by the order number provided) is shown on My orders page as active")
     def order_is_shown_in_list_as_active(self, order_number):
-        all_numbers_of_active_orders = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_NUMBERS_OF_ACTIVE_ORDERS))
+
+        try:
+            all_numbers_of_active_orders = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_NUMBERS_OF_ACTIVE_ORDERS))
+        except TimeoutException:
+            print("No active orders detected on page!")
+            return False
+
         for number_element in all_numbers_of_active_orders:
             clear_number = number_element.text.strip()[1:]
             if clear_number == order_number:
@@ -39,24 +53,36 @@ class MyOrdersPage(BasePage):
 
     @allure.step("Check that specific order (found by the order number provided) is shown on My orders page as canceled")
     def order_is_shown_in_list_as_canceled(self, order_number):
-        all_numbers_of_canceled_orders = self.wait.until(
-            ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_NUMBERS_OF_CANCELED_ORDERS))
+        print(f"Order number is: {order_number}")
+        try:
+            all_numbers_of_canceled_orders = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_NUMBERS_OF_CANCELED_ORDERS))
+        except TimeoutException:
+            print("No cancelled orders detected on page!")
+            return False
+
         for number_element in all_numbers_of_canceled_orders:
             clear_number = number_element.text.strip()[1:]
+            print(f"I compare order number {clear_number} with order number needed")
             if clear_number == order_number:
                 return True
         return False
 
     @allure.step("Get block (web-element) with main info of specific order (found by the order number provided)")
     #  helper-method used to find block (web-element) that contains info of specific order (found by order number provided);
-    def get_order_block(self, order_number):
-        all_orders_shown = self.wait.until(
-            ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ALL_ORDERS))
+    def get_order_block(self, order_number) -> WebElement:
+        try:
+            all_orders_shown = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ALL_ORDERS))
+        except TimeoutException:
+            print("No orders detected on page!")
+            return None
+
         for order in all_orders_shown:
             order_number_detected = order.find_element(*MyOrdersPageLocators.ORDER_NUMBER_SHOWN)
             if order_number_detected.text.strip()[1:] == order_number:
                 return order
 
+        print(f"No order found with the number specified before: {order_number}!")
+        return None
 
     @allure.step("Get sender address from specific order (found by the order number provided)")
     def get_sender_address_from_order(self, order_number):
@@ -99,28 +125,40 @@ class MyOrdersPage(BasePage):
     @allure.step("Cancel specific order with the 'Parcel not ready' reason(found by the order number provided)")
     def cancel_order_as_parcel_not_ready(self, order_number):
         order_needed = self.get_order_block(order_number)
+
         if self.order_is_shown_in_list_as_canceled(order_number) is True:
-            print("Order is already shown as canceled!")
+            print("Order is shown as already cancelled!")
             return
-        cancel_button = self.wait.until(ec.element_to_be_clickable(order_needed.find_element(*MyOrdersPageLocators.CANCEL_ORDER_BUTTON)))
-        cancel_button.click()
-        cancel_order_confirmation_window = self.wait.until(ec.visibility_of_element_located(MyOrdersPageLocators.CANCEL_ORDER_CONFIRMATION_WINDOW))
-        parcel_not_ready_option_in_window = self.wait.until(ec.element_to_be_clickable(cancel_order_confirmation_window.find_element(*MyOrdersPageLocators.PARCEL_NOT_READY_OPTION_IN_CANCEL_ORDER)))
-        parcel_not_ready_option_in_window.click()
-        self.wait.until(ec.element_to_be_selected(parcel_not_ready_option_in_window))
-        confirm_order_cancellation_button = self.wait.until(ec.element_to_be_clickable(MyOrdersPageLocators.CONFIRM_ORDER_CANCELLATION_BUTTON))
-        confirm_order_cancellation_button.click()
-        time.sleep(2)
+
+        if self.order_is_shown_in_list_as_active(order_number) is True:
+            cancel_button = self.wait.until(ec.element_to_be_clickable(order_needed.find_element(*MyOrdersPageLocators.CANCEL_ORDER_BUTTON)))
+            cancel_button.click()
+            cancel_order_confirmation_window = self.wait.until(ec.visibility_of_element_located(MyOrdersPageLocators.CANCEL_ORDER_CONFIRMATION_WINDOW))
+            parcel_not_ready_option_in_window = self.wait.until(ec.element_to_be_clickable(cancel_order_confirmation_window.find_element(*MyOrdersPageLocators.PARCEL_NOT_READY_OPTION_IN_CANCEL_ORDER)))
+            parcel_not_ready_option_in_window.click()
+            self.wait.until(ec.element_to_be_selected(parcel_not_ready_option_in_window))
+            confirm_order_cancellation_button = self.wait.until(ec.element_to_be_clickable(MyOrdersPageLocators.CONFIRM_ORDER_CANCELLATION_BUTTON))
+            confirm_order_cancellation_button.click()
+            print("I clicked to cancel")
+
+            # #DOESN'T WORK
+            self.wait.until(lambda driver: order_needed.get_attribute('class') == 'order canceled')
+            print("Class changed to canceled")
+
+
+            # time.sleep(3)
+            # self.wait.until(lambda driver: len(order_needed.find_elements(*MyOrdersPageLocators.CANCELED_ORDER_INDICATOR)) == 1)
+            # print("I got indicator")
 
     @allure.step("Cancel all orders shown as active on My orders page, with the 'Parcel not ready' reason")
     # helper method to cancel all orders that are shown as active on My orders page
     # (can be used for cleaning after test execution)
     def cancel_all_orders_as_parcel_not_ready(self):
-        all_active_orders_shown = self.wait.until(
-            ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
+        all_active_orders_shown = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
         for active_order in all_active_orders_shown:
             order_number_detected = active_order.find_element(*MyOrdersPageLocators.ORDER_NUMBER_SHOWN).text.strip()[1:]
             self.cancel_order_as_parcel_not_ready(order_number_detected)
+
 
 
 

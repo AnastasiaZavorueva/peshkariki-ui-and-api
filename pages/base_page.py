@@ -30,4 +30,14 @@ class BasePage:
         time.sleep(1)
         return self.browser.current_url
 
+    def scroll_page_to_the_bottom(self):
+        last_height = self.browser.execute_script("return document.body.scrollHeight")
+
+        while True:
+            self.browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)
+            new_height = self.browser.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
 

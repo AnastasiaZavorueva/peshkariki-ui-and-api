@@ -1,7 +1,7 @@
 class TestData:
     valid_login_credentials_msk_user = [{"+79999991122": "coup39fnB90812"}]
 
-    valid_login_credentials_spb_user = [{"+79997777777": "1]23456"}]
+    valid_login_credentials_spb_user = [{"+79997777777": "123456"}]
 
     # None value stands for "not defined", so that no actions are done on these UI elements
     order_info_one = [

@@ -86,4 +86,10 @@ class TestScenarioCreateNewOrder1:
         assert my_orders_page.order_is_shown_in_list_as_canceled(number_of_order_created) is True
 
 
+        # my_orders_page.cancel_all_orders_as_parcel_not_ready()
 
+    # def test_for_methods(self, browser, msk_login):
+    #     my_orders_page = MyOrdersPage(browser, Links.my_orders_page)
+    #     my_orders_page.scroll_page_to_the_bottom()
+    #     my_orders_page.cancel_all_orders_as_parcel_not_ready()
+    #     time.sleep(2)
