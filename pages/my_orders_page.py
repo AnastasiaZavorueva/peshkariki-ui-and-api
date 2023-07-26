@@ -9,6 +9,8 @@ import time
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.expected_conditions import staleness_of
 
+from tests.test_data import WhatToDeliverOptions
+
 
 
 class MyOrdersPage(BasePage):
@@ -38,7 +40,6 @@ class MyOrdersPage(BasePage):
 
     @allure.step("Check that specific order (found by the order number provided) is shown on My orders page as active")
     def order_is_shown_in_list_as_active(self, order_number):
-
         try:
             all_numbers_of_active_orders = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_NUMBERS_OF_ACTIVE_ORDERS))
         except TimeoutException:
@@ -53,16 +54,14 @@ class MyOrdersPage(BasePage):
 
     @allure.step("Check that specific order (found by the order number provided) is shown on My orders page as canceled")
     def order_is_shown_in_list_as_canceled(self, order_number):
-        print(f"Order number is: {order_number}")
         try:
             all_numbers_of_canceled_orders = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_NUMBERS_OF_CANCELED_ORDERS))
         except TimeoutException:
-            print("No cancelled orders detected on page!")
+            print("No canceled orders detected on page!")
             return False
 
         for number_element in all_numbers_of_canceled_orders:
             clear_number = number_element.text.strip()[1:]
-            print(f"I compare order number {clear_number} with order number needed")
             if clear_number == order_number:
                 return True
         return False
@@ -81,18 +80,23 @@ class MyOrdersPage(BasePage):
             if order_number_detected.text.strip()[1:] == order_number:
                 return order
 
-        print(f"No order found with the number specified before: {order_number}!")
+        print(f"No order found with the number specified by you, check test data !")
         return None
 
     @allure.step("Get sender address from specific order (found by the order number provided)")
     def get_sender_address_from_order(self, order_number):
+
+        # ADD CHECK FOR NONE HERE
         order_needed = self.get_order_block(order_number)
+
         sender_address_element = order_needed.find_elements(*MyOrdersPageLocators.ADDRESSES_IN_ORDER_SHOWN)[0]  # we use index 0 because the locator returns 2 elements with addresses: the first one (with index 0) belongs to sender, while the second (with index 1) belongs to recipient
         clear_address_without_subway_info_and_dots_inside = sender_address_element.text.split("км, ")[1].strip().replace(".", "")
         return clear_address_without_subway_info_and_dots_inside
 
     @allure.step("Get recipient address from specific order (found by the order number provided)")
     def get_recipient_address_from_order(self, order_number):
+
+        # ADD CHECK FOR NONE HERE
         order_needed = self.get_order_block(order_number)
         recipient_address_element = (order_needed.find_elements(*MyOrdersPageLocators.ADDRESSES_IN_ORDER_SHOWN))[1]  # we use index 0 because the locator returns 2 elements with addresses: the first one (with index 0) belongs to sender, while the second (with index 1) belongs to recipient
         clear_address_without_subway_info_and_dots_inside = recipient_address_element.text.split("км, ")[1].strip().replace(".", "")
@@ -100,16 +104,24 @@ class MyOrdersPage(BasePage):
 
     @allure.step("Get value of what to deliver from specific order (found by the order number provided)")
     def get_what_to_deliver_from_order(self, order_number):
+
+        # ADD CHECK FOR NONE HERE
         order_needed = self.get_order_block(order_number)
         what_to_deliver_element = order_needed.find_element(*MyOrdersPageLocators.WHAT_TO_DELIVER_SHOWN)
         what_to_deliver_value = what_to_deliver_element.text.split(": ")[1].strip()
-        print (f"text detected: {what_to_deliver_value}")
         if what_to_deliver_value == "Документы":
-            return "docs"
+            return WhatToDeliverOptions.DOCUMENTS
+        if what_to_deliver_value == "Сюрприз":
+            return WhatToDeliverOptions.SURPRISE
+
+        #  TODO: add other options available
+
         return what_to_deliver_value
 
     @allure.step("Get total weight of delivery from specific order (found by the order number provided)")
     def get_total_weight_from_order(self, order_number):
+
+        # ADD CHECK FOR NONE HERE
         order_needed = self.get_order_block(order_number)
         total_weight_element = order_needed.find_element(*MyOrdersPageLocators.TOTAL_WEIGHT_SHOWN)
         clear_total_weight_value = total_weight_element.text.split(" ")[1].strip()
@@ -117,6 +129,8 @@ class MyOrdersPage(BasePage):
 
     @allure.step("Get total value from specific order (found by the order number provided)")
     def get_total_value_from_order(self, order_number):
+
+        # ADD CHECK FOR NONE HERE
         order_needed = self.get_order_block(order_number)
         total_value_element = order_needed.find_element(*MyOrdersPageLocators.TOTAL_VALUE_SHOWN)
         clear_total_value = total_value_element.text.split(" ")[1].strip()
@@ -124,6 +138,8 @@ class MyOrdersPage(BasePage):
 
     @allure.step("Cancel specific order with the 'Parcel not ready' reason(found by the order number provided)")
     def cancel_order_as_parcel_not_ready(self, order_number):
+
+        # ADD CHECK FOR NONE HERE
         order_needed = self.get_order_block(order_number)
 
         if self.order_is_shown_in_list_as_canceled(order_number) is True:
@@ -139,32 +155,41 @@ class MyOrdersPage(BasePage):
             self.wait.until(ec.element_to_be_selected(parcel_not_ready_option_in_window))
             confirm_order_cancellation_button = self.wait.until(ec.element_to_be_clickable(MyOrdersPageLocators.CONFIRM_ORDER_CANCELLATION_BUTTON))
             confirm_order_cancellation_button.click()
-            print("I clicked to cancel")
 
-            self.wait.until(lambda driver: order_needed.get_attribute('class') == 'order canceled')
-            print("Class changed to canceled")
+            # by the next line of code we verify that after clicking on the button "Cancel" (order)
+            # value of the attribute "class" for web-element 'order_needed' was changed from 'order' to 'order canceled'
+            self.wait.until(lambda browser: order_needed.get_attribute('class') == 'order canceled')
+            # lambda method above works this way:
+            # def check_class_changed(browser):
+            #     return order_needed.get_attribute('class') == 'order canceled'
 
-            # ANOTHER WAY TO CHECK "CANCELLED" INDICATOR PRESENCE
+            # ANOTHER WAY TO CHECK that order cancellation was successful:
+            # verify that web-element 'CANCELED_ORDER_INDICATOR' appear inside 'order_needed' web-element
             # self.wait.until(lambda driver: len(order_needed.find_elements(*MyOrdersPageLocators.CANCELED_ORDER_INDICATOR)) == 1)
-            # print("I got indicator")
+
 
     @allure.step("Cancel all orders shown as active on My orders page, with the 'Parcel not ready' reason")
     # helper method to cancel all orders that are shown as active on My orders page
     # (can be used for cleaning after test execution)
     def cancel_all_orders_as_parcel_not_ready(self):
-        all_active_orders_shown = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
+        try:
+            all_active_orders_shown = self.wait.until(ec.visibility_of_all_elements_located(MyOrdersPageLocators.ALL_CARDS_OF_ACTIVE_ORDERS))
+        except TimeoutException:
+            print("No active orders detected to be cancelled")
+            return
+
         for active_order in all_active_orders_shown:
             order_number_detected = active_order.find_element(*MyOrdersPageLocators.ORDER_NUMBER_SHOWN).text.strip()[1:]
             self.cancel_order_as_parcel_not_ready(order_number_detected)
 
 
-
-
-
-
     # #TODO: methods to check 1) start time of pick up 2) end time of pick up 3) start time of delivery 4) end time of delivery 5) price of delivery 6) amount of money to be returned as payments for delivered goods
-    # #TODO: methods to 2) edit order created (can be also used for order data check) 2) cancel order created
+    # #TODO: methods to 7) edit order created (can be also used for order data check) 8) cancel order created
 
     # def get_pick_up_date_from_order(self, order_number):
     #
     # def get_delivery_date_from_order(self, order_number):
+
+
+
+

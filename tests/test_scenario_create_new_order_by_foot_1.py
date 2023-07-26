@@ -7,15 +7,16 @@ import time
 
 import allure
 
-class TestScenarioCreateNewOrder1:
+class TestScenarioCreateNewOrder:
 
     @allure.feature('Order Creation Form')
-    @allure.story('Valid test data, test case ID 1')
+    @allure.story('Valid test data, test cases ID: 1, 2')
     @allure.severity('critical')
-    @allure.description('In the test, a new order is created (type of delivery - by foot) '
-                        'and then verified to have all data recorded correctly')
-    @pytest.mark.parametrize("order_data", TestData.order_info_one)
-    def test_scenario_create_new_order_by_foot_1(self, browser, msk_login, order_data):
+    @allure.description('A new order is created for delivery method "by foot" and with set of data provided;'
+                        'then verification is done for main order components (such as sender address, recipient address,'
+                        'what to delivery value, total weight of delivery, total value of delivery)')
+    @pytest.mark.parametrize("order_data", TestData.order_info)
+    def test_scenario_create_new_order_by_foot(self, browser, msk_login, order_data):
         my_orders_page = MyOrdersPage(browser, Links.my_orders_page)
         my_orders_page.navigate_to_create_order()
         my_orders_page.select_goods_and_docs_delivery()
@@ -52,16 +53,16 @@ class TestScenarioCreateNewOrder1:
         creation_form.type_recipient_name(order_data["recipient_name"])
         creation_form.type_comment_to_recipient_address(order_data["comment_to_recipient_address"])
 
-        creation_form.select_docs_as_what_to_deliver()
+        creation_form.set_what_to_deliver_type(order_data["what_to_deliver"])
         creation_form.set_value_for_one_item(order_data["value_per_item"])
         creation_form.set_custom_weight_in_grams(order_data["weight"])
 
         creation_form.set_quantity(order_data["quantity"])
 
-        creation_form.set_type_of_payment_return_for_goods_as_card()
+        creation_form.select_type_of_payment_return_for_goods_delivered(order_data["type_of_payment_return_for_goods"])
         creation_form.type_billing_info_for_return(order_data["billing_info_for_return"])
 
-        creation_form.set_payment_for_delivery_as_return_except_price_of_delivery()
+        creation_form.select_payment_method_for_delivery(order_data["method_of_payment_for_delivery"])
         creation_form.type_promocode(order_data["promocode"])
 
         creation_form.accept_order_creation_form()
@@ -77,7 +78,7 @@ class TestScenarioCreateNewOrder1:
         assert my_orders_page.get_sender_address_from_order(number_of_order_created) == order_data["sender_address"]
         assert my_orders_page.get_recipient_address_from_order(number_of_order_created) == order_data["recipient_address"]
 
-        assert my_orders_page.get_what_to_deliver_from_order(number_of_order_created) == order_data["what_to_deliver"]
+        assert my_orders_page.get_what_to_deliver_from_order(number_of_order_created) == order_data["what_to_deliver"]  # test it
         assert my_orders_page.get_total_weight_from_order(number_of_order_created) == (order_data["weight"]*order_data["quantity"])
         assert my_orders_page.get_total_value_from_order(number_of_order_created) == (order_data["quantity"]*order_data["value_per_item"])
 
@@ -86,10 +87,8 @@ class TestScenarioCreateNewOrder1:
         assert my_orders_page.order_is_shown_in_list_as_canceled(number_of_order_created) is True
 
 
-        # my_orders_page.cancel_all_orders_as_parcel_not_ready()
 
-    # def test_for_methods(self, browser, msk_login):
+    # def test_cancel_all_active_orders(self, browser, msk_login):
     #     my_orders_page = MyOrdersPage(browser, Links.my_orders_page)
     #     my_orders_page.scroll_page_to_the_bottom()
     #     my_orders_page.cancel_all_orders_as_parcel_not_ready()
-    #     time.sleep(2)
