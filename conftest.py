@@ -15,7 +15,7 @@ def browser():
     """fixture to open Chrome browser before running tests, and to quit browser after that;
     automatically & implicitly started (by "autouse" parameter)
     for every test where this fixture is mentioned as a parameter of test"""
-    browser = webdriver.Chrome(service=Service(executable_path='.chromedriver'))
+    browser = webdriver.Chrome()
     yield browser
     filename = os.path.abspath(os.getcwd()) + f'/{datetime.datetime.now()}.png'
     print(filename)
